@@ -17,7 +17,7 @@ class Command(BaseCommand):
         
         self.stdout.write(f"Starting data generation with ratio: {ratio}")
         
-        # 1. Создаем пользователей (ratio)
+  
         self.stdout.write(f"Creating {ratio} users...")
         users = []
         for i in range(ratio):
@@ -31,17 +31,17 @@ class Command(BaseCommand):
             if i % 1000 == 0 and i > 0:
                 self.stdout.write(f"Created {i} users...")
         
-        # 2. Создаем теги (ratio)
+     
         self.stdout.write(f"Creating {ratio} tags...")
         tags = []
         for i in range(ratio):
-            tag_name = fake.word() + str(i)  # Уникальное имя тега
+            tag_name = fake.word() + str(i)  
             tag = Tag.objects.create(name=tag_name)
             tags.append(tag)
             if i % 1000 == 0 and i > 0:
                 self.stdout.write(f"Created {i} tags...")
         
-        # 3. Создаем вопросы (ratio * 10)
+        
         questions_count = ratio * 10
         self.stdout.write(f"Creating {questions_count} questions...")
         questions = []
@@ -51,10 +51,10 @@ class Command(BaseCommand):
                 title=fake.sentence()[:200],
                 content=fake.text(max_nb_chars=500),
                 author=author,
-                rating=0  # Будет обновлен после создания лайков
+                rating=0  
             )
             
-            # Добавляем случайные теги (1-3 тега на вопрос)
+           
             question_tags = random.sample(tags, random.randint(1, 3))
             question.tags.set(question_tags)
             questions.append(question)
@@ -62,7 +62,7 @@ class Command(BaseCommand):
             if i % 10000 == 0 and i > 0:
                 self.stdout.write(f"Created {i} questions...")
         
-        # 4. Создаем ответы (ratio * 100)
+       
         answers_count = ratio * 100
         self.stdout.write(f"Creating {answers_count} answers...")
         answers = []
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 content=fake.text(max_nb_chars=300),
                 author=author,
                 question=question,
-                rating=0,  # Будет обновлен после создания лайков
+                rating=0,  
                 is_correct=random.choice([True, False]) if i % 10 == 0 else False
             )
             answers.append(answer)
@@ -81,16 +81,15 @@ class Command(BaseCommand):
             if i % 100000 == 0 and i > 0:
                 self.stdout.write(f"Created {i} answers...")
         
-        # 5. Создаем оценки пользователей (ratio * 200)
+        
         likes_count = ratio * 200
         self.stdout.write(f"Creating {likes_count} user ratings...")
         
-        # Лайки для вопросов
+       
         for i in range(likes_count // 2):
             user = random.choice(users)
             question = random.choice(questions)
-            
-            # Проверяем, не существует ли уже такой лайк
+   
             if not QuestionLike.objects.filter(user=user, question=question).exists():
                 QuestionLike.objects.create(
                     user=user,
@@ -101,7 +100,7 @@ class Command(BaseCommand):
             if i % 100000 == 0 and i > 0:
                 self.stdout.write(f"Created {i} question likes...")
         
-        # Лайки для ответов
+   
         for i in range(likes_count // 2):
             user = random.choice(users)
             answer = random.choice(answers)
@@ -116,7 +115,7 @@ class Command(BaseCommand):
             if i % 100000 == 0 and i > 0:
                 self.stdout.write(f"Created {i} answer likes...")
         
-        # Обновляем рейтинги вопросов и ответов
+       
         self.stdout.write("Updating ratings...")
         for question in questions:
             question.update_rating()
